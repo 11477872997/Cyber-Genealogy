@@ -1,0 +1,21 @@
+{
+    "name" : "赛博宗族",
+    "appid" : "__UNI__395E4EB",
+    "description" : "家族族谱与家人共享工具",
+    "versionName" : "0.1.0",
+    "versionCode" : "1",
+    "vueVersion" : "3",
+    "transformPx" : false,
+    "uniCloud" : {
+        "provider" : "alipay"
+    },
+    "mp-weixin" : {
+        "appid" : "wx62949071579e18e7",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : true,
+            "minified" : true
+        },
+        "usingComponents" : {}
+    }
+}

@@ -1,0 +1,15 @@
+{
+  "bsonType": "object",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["user_id", "type", "content", "status", "created_at", "updated_at"],
+  "properties": {
+    "user_id": { "bsonType": "string" },
+    "type": { "bsonType": "string" },
+    "content": { "bsonType": "string" },
+    "contact": { "bsonType": "string" },
+    "status": { "bsonType": "string" },
+    "reply": { "bsonType": "string" },
+    "created_at": { "bsonType": "timestamp" },
+    "updated_at": { "bsonType": "timestamp" }
+  }
+}

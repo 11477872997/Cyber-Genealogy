@@ -1,0 +1,66 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "我的掌上族谱" }
+    },
+    {
+      "path": "pages/me/index",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "我的" }
+    },
+    {
+      "path": "pages/families/index",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "我的族谱" }
+    },
+    {
+      "path": "pages/families/detail",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "族谱详情" }
+    },
+    {
+      "path": "pages/families/create",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "创建族谱" }
+    },
+    {
+      "path": "pages/families/tree",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "家族树谱", "disableScroll": true }
+    },
+    {
+      "path": "pages/members/detail",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "成员资料" }
+    },
+    {
+      "path": "pages/members/form",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "成员资料" }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "赛博宗族",
+    "navigationBarBackgroundColor": "#edf0e9",
+    "backgroundColor": "#edf0e9"
+  },
+  "tabBar": {
+    "color": "#8b9992",
+    "selectedColor": "#a58a5a",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "height": "46px",
+    "iconWidth": "21px",
+    "fontSize": "10px",
+    "spacing": "2px",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "族谱",
+        "iconPath": "static/tab-family.png",
+        "selectedIconPath": "static/tab-family-active.png"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "我的",
+        "iconPath": "static/tab-me.png",
+        "selectedIconPath": "static/tab-me-active.png"
+      }
+    ]
+  }
+}

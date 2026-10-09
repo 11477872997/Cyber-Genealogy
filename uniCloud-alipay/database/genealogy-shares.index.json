@@ -1,0 +1,4 @@
+[
+  { "IndexName": "token_hash_unique", "MgoKeySchema": { "MgoIndexKeys": [{ "Name": "token_hash", "Direction": "1" }], "MgoIsUnique": true } },
+  { "IndexName": "family_id", "MgoKeySchema": { "MgoIndexKeys": [{ "Name": "family_id", "Direction": "1" }], "MgoIsUnique": false } }
+]

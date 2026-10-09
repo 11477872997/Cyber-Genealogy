@@ -1,0 +1,14 @@
+{
+  "id": "fg-tree",
+  "displayName": "fg-tree Vue3 移植版",
+  "version": "1.0.1-vue3",
+  "type": "module",
+  "description": "基于用户提供的 fg-tree 1.0.1 示例源码移植，适配 uni-app Vue3。",
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "client": { "H5-mobile": "y", "MP-WEIXIN": "y" }
+    }
+  }
+}

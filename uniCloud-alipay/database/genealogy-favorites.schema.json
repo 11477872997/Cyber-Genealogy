@@ -1,0 +1,10 @@
+{
+  "bsonType": "object",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["user_id", "family_id", "created_at"],
+  "properties": {
+    "user_id": { "bsonType": "string" },
+    "family_id": { "bsonType": "string" },
+    "created_at": { "bsonType": "timestamp" }
+  }
+}

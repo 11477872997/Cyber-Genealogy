@@ -1,0 +1,13 @@
+{
+  "bsonType": "object",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["family_id", "user_id", "role", "status", "created_at"],
+  "properties": {
+    "family_id": { "bsonType": "string" },
+    "user_id": { "bsonType": "string" },
+    "role": { "bsonType": "string", "enum": ["viewer", "editor"] },
+    "status": { "bsonType": "string", "enum": ["active", "revoked"] },
+    "created_at": { "bsonType": "timestamp" },
+    "updated_at": { "bsonType": "timestamp" }
+  }
+}

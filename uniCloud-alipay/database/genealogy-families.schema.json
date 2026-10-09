@@ -1,0 +1,20 @@
+{
+  "bsonType": "object",
+  "permission": { "read": false, "create": false, "update": false, "delete": false },
+  "required": ["owner_uid", "client_id", "name", "members", "comments", "created_at", "updated_at"],
+  "properties": {
+    "owner_uid": { "bsonType": "string" },
+    "client_id": { "bsonType": "string" },
+    "name": { "bsonType": "string" },
+    "surname": { "bsonType": "string" },
+    "region": { "bsonType": "string" },
+    "description": { "bsonType": "string" },
+    "motto": { "bsonType": "string" },
+    "rules": { "bsonType": "string" },
+    "members": { "bsonType": "array" },
+    "comments": { "bsonType": "array" },
+    "version": { "bsonType": "int" },
+    "created_at": { "bsonType": "timestamp" },
+    "updated_at": { "bsonType": "timestamp" }
+  }
+}

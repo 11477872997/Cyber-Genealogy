@@ -1,0 +1,4 @@
+[
+  { "IndexName": "client_id_unique", "MgoKeySchema": { "MgoIndexKeys": [{ "Name": "client_id", "Direction": "1" }], "MgoIsUnique": true } },
+  { "IndexName": "owner_updated", "MgoKeySchema": { "MgoIndexKeys": [{ "Name": "owner_uid", "Direction": "1" }, { "Name": "updated_at", "Direction": "-1" }], "MgoIsUnique": false } }
+]

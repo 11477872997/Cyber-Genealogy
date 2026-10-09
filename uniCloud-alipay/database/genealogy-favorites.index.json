@@ -1,0 +1,3 @@
+[
+  { "IndexName": "user_family_unique", "MgoKeySchema": { "MgoIndexKeys": [{ "Name": "user_id", "Direction": "1" }, { "Name": "family_id", "Direction": "1" }], "MgoIsUnique": true } }
+]
