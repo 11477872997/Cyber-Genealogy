@@ -5,6 +5,7 @@ import AppShell from '../../components/layout/AppShell.vue'
 import FavoritesPanel from '../../components/family/FavoritesPanel.vue'
 import FeedbackPanel from '../../components/feedback/FeedbackPanel.vue'
 import FeedbackAdminModal from '../../components/feedback/FeedbackAdminModal.vue'
+import LegalConsent from '../../components/legal/LegalConsent.vue'
 import { useGenealogyStore } from '../../services/genealogyStore'
 import {
   cloudErrorMessage,
@@ -15,6 +16,11 @@ import {
   useCloudAccount,
 } from '../../services/cloudService.js'
 import { loginAndLoadAccount, logoutAccount } from '../../services/cloudSession.js'
+import {
+  acceptLegalDocuments,
+  hasAcceptedLegalDocuments,
+  isLegalConsentError,
+} from '../../services/privacyConsent.js'
 
 const { families, favorites, feedbacks, addFeedback, toggleFavorite, selectFamily } = useGenealogyStore()
 const { loggedIn, profile, sessionLoading } = useCloudAccount()
@@ -25,6 +31,7 @@ const editingProfile = ref(false)
 const savingProfile = ref(false)
 const nickname = ref(profile.value?.nickName || '')
 const avatar = ref(profile.value?.avatarUrl || '')
+const legalAgreed = ref(hasAcceptedLegalDocuments())
 let versionClicks = 0
 let versionTimer
 
@@ -50,6 +57,11 @@ async function tapVersion() {
 }
 
 async function login() {
+  if (!legalAgreed.value) {
+    uni.showToast({ title: '请先阅读并同意用户服务协议和隐私政策', icon: 'none' })
+    return
+  }
+  acceptLegalDocuments()
   try {
     const result = await loginAndLoadAccount()
     uni.showToast({ title: '登录成功', icon: 'success' })
@@ -59,12 +71,21 @@ async function login() {
     }
     if (!profile.value?.nickName) editingProfile.value = true
   } catch (error) {
+    if (isLegalConsentError(error)) {
+      uni.showToast({ title: error.message, icon: 'none' })
+      return
+    }
     uni.showModal({ title: '登录失败', content: cloudErrorMessage(error, '请检查云服务和微信登录配置'), showCancel: false })
   }
 }
 
 function openProfile() {
   if (!loggedIn.value) return login()
+  if (!legalAgreed.value) {
+    uni.showToast({ title: '请先阅读并同意用户服务协议和隐私政策', icon: 'none' })
+    return
+  }
+  acceptLegalDocuments()
   editingProfile.value = true
 }
 
@@ -154,13 +175,18 @@ function openFavorite(family) {
     <view v-else class="archive-me-page">
       <view class="archive-profile">
         <button class="archive-profile-avatar" type="button" @click="openProfile"><image v-if="profile?.avatarUrl" :src="profile.avatarUrl" mode="aspectFill" /><AppIcon v-else type="person" :size="34" /></button>
-        <view><view class="archive-profile-name">{{ loggedIn ? (profile?.nickName || '微信用户') : '尚未登录' }}</view><view class="archive-profile-note">{{ loggedIn ? '族谱已按微信账号保存到云端' : '登录后同步族谱并接收分享' }}</view></view>
+        <view class="archive-profile-copy"><view class="archive-profile-name">{{ loggedIn ? (profile?.nickName || '微信用户') : '尚未登录' }}</view><view class="archive-profile-note">{{ loggedIn ? '族谱已按微信账号保存到云端' : '登录后同步族谱并接收分享' }}</view></view>
         <button class="archive-profile-login" type="button" :disabled="sessionLoading" @click="openProfile">{{ loggedIn ? '设置资料' : (sessionLoading ? '登录中' : '微信登录') }}</button>
+      </view>
+      <view v-if="!legalAgreed" class="archive-login-consent">
+        <LegalConsent v-model="legalAgreed" description="用于账号同步、族谱资料处理、分享及反馈服务" />
       </view>
       <view class="archive-me-menu">
         <button type="button" @click="uni.switchTab({ url: '/pages/index/index' })"><AppIcon type="home" :size="21" /><view>我的族谱</view><view class="archive-me-count">{{ families.length }} 份</view><AppIcon type="right" :size="18" /></button>
         <button type="button" @click="section = 'favorites'"><AppIcon type="star" :size="21" /><view>收藏族谱</view><view class="archive-me-count">{{ favorites.length }} 份</view><AppIcon type="right" :size="18" /></button>
         <button type="button" @click="section = 'feedback'"><AppIcon type="chat" :size="21" /><view>意见反馈</view><view class="archive-me-count">{{ feedbacks.length }} 条</view><AppIcon type="right" :size="18" /></button>
+        <button type="button" @click="uni.navigateTo({ url: '/pages/legal/terms' })"><AppIcon type="auth" :size="21" /><view>用户服务协议</view><AppIcon type="right" :size="18" /></button>
+        <button type="button" @click="uni.navigateTo({ url: '/pages/legal/privacy' })"><AppIcon type="info" :size="21" /><view>隐私政策</view><AppIcon type="right" :size="18" /></button>
       </view>
       <view class="archive-ad-slot"><view>广告位预留</view><view class="archive-ad-note">接入微信流量主后展示 Banner 广告</view></view>
       <button v-if="loggedIn" class="archive-logout" type="button" @click="logout">退出登录</button>

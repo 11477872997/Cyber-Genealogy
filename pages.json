@@ -31,6 +31,14 @@
     {
       "path": "pages/members/form",
       "style": { "navigationStyle": "custom", "navigationBarTitleText": "成员资料" }
+    },
+    {
+      "path": "pages/legal/privacy",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "隐私政策" }
+    },
+    {
+      "path": "pages/legal/terms",
+      "style": { "navigationStyle": "custom", "navigationBarTitleText": "用户服务协议" }
     }
   ],
   "globalStyle": {

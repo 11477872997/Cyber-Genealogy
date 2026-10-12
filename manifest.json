@@ -6,11 +6,15 @@
     "versionCode" : "1",
     "vueVersion" : "3",
     "transformPx" : false,
+    "uniStatistics" : {
+        "enable" : false
+    },
     "uniCloud" : {
         "provider" : "alipay"
     },
     "mp-weixin" : {
         "appid" : "wx62949071579e18e7",
+        "__usePrivacyCheck__" : true,
         "setting" : {
             "urlCheck" : false,
             "es6" : true,

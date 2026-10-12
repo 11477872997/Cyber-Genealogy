@@ -2,9 +2,11 @@
 import { computed, reactive, ref } from 'vue'
 import { onLoad, onShareAppMessage, onShareTimeline, onShow } from '@dcloudio/uni-app'
 import AppShell from '../../components/layout/AppShell.vue'
+import LegalConsent from '../../components/legal/LegalConsent.vue'
 import { useGenealogyStore } from '../../services/genealogyStore'
 import { cloudErrorMessage, flushFamilySave, hasCloudSession } from '../../services/cloudService.js'
 import { pageSharePayload, pageTimelinePayload, showPageShareMenu } from '../../services/pageShare.js'
+import { acceptLegalDocuments, hasAcceptedLegalDocuments } from '../../services/privacyConsent.js'
 
 onShow(showPageShareMenu)
 onShareAppMessage(pageSharePayload)
@@ -16,6 +18,7 @@ const blocked = ref(false)
 const error = ref('')
 const saving = ref(false)
 const pendingCreatedFamily = ref(null)
+const legalAgreed = ref(hasAcceptedLegalDocuments())
 const form = reactive({ name: '', surname: '', region: '', description: '', motto: '', rules: '' })
 const editing = computed(() => !!editingId.value)
 
@@ -36,6 +39,11 @@ onLoad((options) => {
 
 async function save() {
   if (blocked.value || saving.value) return
+  if (!legalAgreed.value) {
+    error.value = '请先阅读并同意用户服务协议和隐私政策'
+    return
+  }
+  acceptLegalDocuments()
   if (!form.name.trim() || !form.surname.trim() || !form.region.trim()) {
     error.value = '请填写族谱名称、姓氏和根地区'
     return
@@ -89,8 +97,13 @@ function setField(key, event) {
         <view class="archive-form-textarea"><view>家训 <view class="archive-optional">最多 300 字</view></view><textarea :value="form.motto" maxlength="300" placeholder="记录家族精神" @input="setField('motto', $event)"></textarea></view>
         <view class="archive-form-textarea"><view>家规 <view class="archive-optional">最多 300 字</view></view><textarea :value="form.rules" maxlength="300" placeholder="记录家族约定" @input="setField('rules', $event)"></textarea></view>
       </view>
+      <view class="archive-form-consent"><LegalConsent v-model="legalAgreed" description="族谱和成员资料将按你的登录账号保存，并按分享权限提供给受邀者" /></view>
       <view v-if="error" class="archive-form-error">{{ error }}</view>
     </view>
     <template #bottom><view v-if="!blocked" class="archive-form-bottom"><button type="button" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button></view></template>
   </AppShell>
 </template>
+
+<style scoped>
+.archive-form-consent { margin: 0 12px 12px; padding: 11px 8px; border: 1px solid #dfe6de; border-radius: 7px; background: #fff; }
+</style>

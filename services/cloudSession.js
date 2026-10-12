@@ -9,6 +9,7 @@ import {
   withGlobalLoading,
 } from './cloudService.js'
 import { useGenealogyStore } from './genealogyStore.js'
+import { ensurePrivacyAuthorization } from './privacyConsent.js'
 
 const PENDING_SHARE_KEY = 'cyber-genealogy:pending-share'
 const MIGRATION_PREFIX = 'cyber-genealogy:migrated:'
@@ -72,6 +73,7 @@ async function loadAccount(uid, localSnapshot, { acceptPendingShare = true } = {
 }
 
 export async function loginAndLoadAccount() {
+  await ensurePrivacyAuthorization()
   return withGlobalLoading(async () => {
     const store = useGenealogyStore()
     const localSnapshot = store.exportLocalData()

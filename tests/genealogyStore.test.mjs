@@ -15,6 +15,21 @@ const { flattenFgTree, layoutFgTree } = await import('../uni_modules/fg-tree/com
 const { isMemberAlive } = await import('../services/memberStatus.js')
 const { acceptOrRememberShare, getPendingShareToken, restoreCloudSession } = await import('../services/cloudSession.js')
 const { createShareCloud } = await import('../services/cloudService.js')
+const {
+  LEGAL_VERSION,
+  acceptLegalDocuments,
+  hasAcceptedLegalDocuments,
+  requireLegalConsent,
+} = await import('../services/privacyConsent.js')
+
+test('legal consent is explicit and versioned', () => {
+  storage.delete('cyber-genealogy:legal-consent')
+  assert.equal(hasAcceptedLegalDocuments(), false)
+  assert.throws(() => requireLegalConsent(), (error) => error.code === 'LEGAL_CONSENT_REQUIRED')
+  acceptLegalDocuments()
+  assert.equal(hasAcceptedLegalDocuments(), true)
+  assert.equal(storage.get('cyber-genealogy:legal-consent').version, LEGAL_VERSION)
+})
 
 test('Vue3 fg-tree adapter nests spouses and children without mutating members', () => {
   const members = [

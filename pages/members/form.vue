@@ -3,9 +3,15 @@ import { computed, reactive, ref } from 'vue'
 import { onLoad, onShareAppMessage, onShareTimeline, onShow } from '@dcloudio/uni-app'
 import AppShell from '../../components/layout/AppShell.vue'
 import AppIcon from '../../components/icons/AppIcon.vue'
+import LegalConsent from '../../components/legal/LegalConsent.vue'
 import { useGenealogyStore } from '../../services/genealogyStore'
 import { compressAvatarToBase64 } from '../../services/cloudService.js'
 import { pageSharePayload, pageTimelinePayload, showPageShareMenu } from '../../services/pageShare.js'
+import {
+  acceptLegalDocuments,
+  ensurePrivacyAuthorization,
+  hasAcceptedLegalDocuments,
+} from '../../services/privacyConsent.js'
 
 onShow(showPageShareMenu)
 onShareAppMessage(pageSharePayload)
@@ -18,6 +24,7 @@ const relationKey = ref('root')
 const blocked = ref(false)
 const saving = ref(false)
 const error = ref('')
+const legalAgreed = ref(hasAcceptedLegalDocuments())
 const genders = ['男', '女']
 const statusOptions = ['正常', '失联', '迁出', '其他']
 const bloodTypes = ['未知', 'A型', 'B型', 'AB型', 'O型']
@@ -75,6 +82,17 @@ function chooseFrom(key, options, event) {
 }
 
 async function chooseAvatar() {
+  if (!legalAgreed.value) {
+    uni.showToast({ title: '请先阅读并同意隐私政策', icon: 'none' })
+    return
+  }
+  acceptLegalDocuments()
+  try {
+    await ensurePrivacyAuthorization()
+  } catch {
+    uni.showToast({ title: '未获得头像选择授权', icon: 'none' })
+    return
+  }
   uni.chooseImage({
     count: 1,
     sizeType: ['compressed'],
@@ -94,6 +112,11 @@ async function chooseAvatar() {
 
 function save() {
   if (blocked.value || saving.value) return
+  if (!legalAgreed.value) {
+    error.value = '请先阅读并同意用户服务协议和隐私政策'
+    return
+  }
+  acceptLegalDocuments()
   if (!form.surname.trim() || !form.givenName.trim()) {
     error.value = '请填写姓氏和名字'
     return
@@ -158,6 +181,7 @@ function save() {
         <view class="member-form-row"><text>单位</text><input :value="form.company" maxlength="80" placeholder="填写所属单位" @input="setField('company', $event)" /></view>
         <view class="member-form-row"><text>职位</text><input :value="form.position" maxlength="50" placeholder="填写职位信息" @input="setField('position', $event)" /></view>
       </view>
+      <view class="member-form-consent"><LegalConsent v-model="legalAgreed" description="请确认已取得在世成员本人或监护人同意；如填写血型等敏感信息，已取得其单独同意" /></view>
       <view v-if="error" class="member-form-error">{{ error }}</view>
     </view>
     <template #bottom><view v-if="!blocked" class="member-form-bottom"><button type="button" :disabled="saving" @tap="save">{{ saving ? '保存中' : '保存' }}</button></view></template>
@@ -183,6 +207,7 @@ function save() {
 .member-form-label text { margin-left: 5px; color: #a3aaa6; font-size: 9px; font-weight: 400; }
 .member-form-section textarea { width: 100%; height: 112px; padding: 12px; border: 1px solid #dfe5df; border-radius: 6px; color: #46504b; font-size: 12px; line-height: 1.65; }
 .member-form-error { padding: 0 5px 12px; color: #bc5c49; font-size: 12px; }
+.member-form-consent { margin: 0 4px 12px; padding: 11px 8px; border: 1px solid #dfe6de; border-radius: 7px; background: #fff; }
 .member-form-bottom { padding: 9px 16px max(9px, env(safe-area-inset-bottom)); border-top: 1px solid #e1e6e1; background: #fff; }
 .member-form-bottom button { width: 100%; height: 46px; border: 0; border-radius: 8px; color: #fff; background: #aa8e58; font-size: 16px; font-weight: 700; box-shadow: 0 5px 12px rgba(130, 105, 63, .2); }
 .member-form-bottom button[disabled] { color: #fff; background: #b9a786; opacity: 1; }

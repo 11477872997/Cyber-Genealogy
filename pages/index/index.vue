@@ -10,6 +10,7 @@ import {
   rememberShareToken,
 } from '../../services/cloudSession.js'
 import { pageSharePayload, pageTimelinePayload, showPageShareMenu } from '../../services/pageShare.js'
+import { hasAcceptedLegalDocuments } from '../../services/privacyConsent.js'
 
 const sharePayload = ref(null)
 const shareEntryBusy = ref(false)
@@ -41,6 +42,18 @@ async function acceptPendingShare(token) {
 function requestShareLogin(token) {
   if (!token || promptedToken === token || shareEntryBusy.value) return
   promptedToken = token
+  if (!hasAcceptedLegalDocuments()) {
+    uni.showModal({
+      title: '登录并查看分享族谱',
+      content: '请先阅读并同意《用户服务协议》和《隐私政策》，再使用微信登录接收分享。',
+      confirmText: '前往登录',
+      success: ({ confirm }) => {
+        if (confirm) uni.switchTab({ url: '/pages/me/index' })
+        else promptedToken = ''
+      },
+    })
+    return
+  }
   uni.showModal({
     title: '查看分享族谱',
     content: '微信登录后即可查看这份族谱，获得编辑权限时也会自动加入同一份族谱。',
