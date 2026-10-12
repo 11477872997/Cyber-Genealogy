@@ -53,8 +53,11 @@ async function login() {
   try {
     const result = await loginAndLoadAccount()
     uni.showToast({ title: '登录成功', icon: 'success' })
+    if (result.acceptedFamilyId) {
+      uni.navigateTo({ url: `/pages/families/detail?id=${encodeURIComponent(result.acceptedFamilyId)}` })
+      return
+    }
     if (!profile.value?.nickName) editingProfile.value = true
-    if (result.acceptedFamilyId) uni.navigateTo({ url: `/pages/families/detail?id=${encodeURIComponent(result.acceptedFamilyId)}` })
   } catch (error) {
     uni.showModal({ title: '登录失败', content: cloudErrorMessage(error, '请检查云服务和微信登录配置'), showCancel: false })
   }

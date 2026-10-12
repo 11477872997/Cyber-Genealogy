@@ -26,6 +26,10 @@ function pendingShare() {
   try { return uni.getStorageSync(PENDING_SHARE_KEY) || '' } catch { return '' }
 }
 
+export function getPendingShareToken() {
+  return pendingShare()
+}
+
 export function rememberShareToken(token) {
   if (!token) return
   try { uni.setStorageSync(PENDING_SHARE_KEY, token) } catch { /* Ignore storage failures. */ }
@@ -35,7 +39,7 @@ function clearPendingShare() {
   try { uni.removeStorageSync(PENDING_SHARE_KEY) } catch { /* Ignore storage failures. */ }
 }
 
-async function loadAccount(uid, localSnapshot) {
+async function loadAccount(uid, localSnapshot, { acceptPendingShare = true } = {}) {
   const store = useGenealogyStore()
   if (!migrationDone(uid)) {
     await migrateLocalData(localSnapshot || store.exportLocalData())
@@ -43,7 +47,7 @@ async function loadAccount(uid, localSnapshot) {
     store.clearMigratedGuestData()
   }
   let acceptedFamilyId = ''
-  const token = pendingShare()
+  const token = acceptPendingShare ? pendingShare() : ''
   if (token) {
     const accepted = await acceptShareCloud(token)
     acceptedFamilyId = accepted.family && accepted.family.id || ''
@@ -93,7 +97,9 @@ export async function restoreCloudSession() {
   restoring = (async () => {
     const info = uniCloud.getCurrentUserInfo()
     try {
-      return await loadAccount(info.uid)
+      // The share landing page consumes the token so it can navigate to the
+      // accepted family after account restoration finishes.
+      return await loadAccount(info.uid, undefined, { acceptPendingShare: false })
     } catch (error) {
       if (!hasCloudSession()) store.resetToGuest()
       throw error
@@ -110,7 +116,10 @@ export async function logoutAccount() {
 export async function acceptOrRememberShare(token) {
   rememberShareToken(token)
   if (!hasCloudSession()) return { needsLogin: true }
-  const accepted = await acceptShareCloud(token)
+  if (restoring) await restoring
+  const shareToken = token || pendingShare()
+  if (!shareToken) return { needsLogin: false, family: null }
+  const accepted = await acceptShareCloud(shareToken)
   clearPendingShare()
   const bootstrap = await fetchBootstrap()
   const feedbackResult = await listMyFeedbackCloud()

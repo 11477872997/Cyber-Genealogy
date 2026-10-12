@@ -23,8 +23,7 @@ function startInitialBoot(options = {}) {
 
 onLaunch(startInitialBoot)
 onShow((options = {}) => {
-  const shareToken = rememberOptions(options)
+  rememberOptions(options)
   if (!booted) return startInitialBoot(options)
-  if (shareToken) withGlobalLoading(() => restoreCloudSession(), 320).catch((error) => console.error('Shared family load failed', error))
 })
 </script>

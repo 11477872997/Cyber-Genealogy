@@ -13,7 +13,7 @@ const { buildFamilyTree } = await import('../services/familyTree.js')
 const { toFgTree } = await import('../services/fgTreeAdapter.js')
 const { flattenFgTree, layoutFgTree } = await import('../uni_modules/fg-tree/components/fg-tree/layout.js')
 const { isMemberAlive } = await import('../services/memberStatus.js')
-const { restoreCloudSession } = await import('../services/cloudSession.js')
+const { acceptOrRememberShare, getPendingShareToken, restoreCloudSession } = await import('../services/cloudSession.js')
 const { createShareCloud } = await import('../services/cloudService.js')
 
 test('Vue3 fg-tree adapter nests spouses and children without mutating members', () => {
@@ -171,6 +171,14 @@ test('cold boot without a cloud session restores and selects the guest example',
   assert.equal(store.families.value.some((family) => family.id === 'family-li' && family.isExample), true)
   assert.equal(store.selectedFamilyId.value, 'family-li')
   assert.equal(store.members.value.length, 8)
+})
+
+test('a logged-out share entry remains pending until login completes', async () => {
+  storage.delete('uni_id_token')
+  storage.delete('uni_id_token_expired')
+  const result = await acceptOrRememberShare('share-token-before-login')
+  assert.deepEqual(result, { needsLogin: true })
+  assert.equal(getPendingShareToken(), 'share-token-before-login')
 })
 
 test('account cache recovery includes only owned families never confirmed by cloud', () => {
